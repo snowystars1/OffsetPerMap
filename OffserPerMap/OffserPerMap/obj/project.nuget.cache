@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "luFwRaCz+/gXEaicj12Wxnk5atXbQvQyDKO0l1Uy5Hb0tVERYXl2xyZT75Y5XqLc7met3Cp9PZBzhngwnIckwg==",
+  "dgSpecHash": "rPZoOoJpPSgWOlKwsZ8tOVu9lbx3ghWBViG9CEeSh33v0tBb82q1vLlYeB8toaQCjdgRylXZQNohCGq2FI8iuw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Chris\\Documents\\GitHub\\OffsetPerMap\\OffserPerMap\\OffserPerMap\\OffserPerMap.csproj",
+  "projectFilePath": "C:\\Users\\Chris\\Documents\\GitHub\\OffsetPerMap\\OffserPerMap\\OffserPerMap\\OffsetPerMap.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Chris\\.nuget\\packages\\beatsabermoddingtools.tasks\\1.2.3\\beatsabermoddingtools.tasks.1.2.3.nupkg.sha512",
     "C:\\Users\\Chris\\.nuget\\packages\\microsoft.build.framework\\16.5.0\\microsoft.build.framework.16.5.0.nupkg.sha512",

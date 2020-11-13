@@ -8,8 +8,11 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using IPALogger = IPA.Logging.Logger;
+using BS_Utils;
+using BS_Utils.Gameplay;
+using BS_Utils.Utilities;
 
-namespace OffserPerMap
+namespace OffsetPerMap
 {
     [Plugin(RuntimeOptions.SingleStartInit)]
     public class Plugin
@@ -27,7 +30,7 @@ namespace OffserPerMap
         {
             Instance = this;
             Log = logger;
-            Log.Info("OffserPerMap initialized.");
+            Log.Info("OffsetPerMap initialized.");
         }
 
         #region BSIPA Config
@@ -43,15 +46,19 @@ namespace OffserPerMap
         #endregion
 
         [OnStart]
-        public void OnApplicationStart()
+        public void OnStart()
         {
             Log.Debug("OnApplicationStart");
-            new GameObject("OffserPerMapController").AddComponent<OffserPerMapController>();
+            BSEvents.lateMenuSceneLoadedFresh += delegate (ScenesTransitionSetupDataSO o)
+            {
+                Plugin.Log.Info("OffsetPerMap - Menu Scene Was Loaded");
+                new GameObject("OffsetPerMapController").AddComponent<OffsetPerMapController>();
+            };
 
         }
 
         [OnExit]
-        public void OnApplicationQuit()
+        public void OnExit()
         {
             Log.Debug("OnApplicationQuit");
 

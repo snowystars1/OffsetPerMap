@@ -1,7 +1,7 @@
 ﻿{
   "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
-  "id": "OffserPerMap",
-  "name": "OffserPerMap",
+  "id": "OffsetPerMap",
+  "name": "OffsetPerMap",
   "author": "SSnowy",
   "version": "0.0.1",
   "description": "",

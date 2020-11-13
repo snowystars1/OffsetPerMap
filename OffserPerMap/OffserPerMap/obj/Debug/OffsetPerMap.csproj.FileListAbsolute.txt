@@ -1,0 +1,4 @@
+C:\Users\Chris\Documents\GitHub\OffsetPerMap\OffserPerMap\OffserPerMap\obj\Debug\OffsetPerMap.csprojAssemblyReference.cache
+C:\Users\Chris\Documents\GitHub\OffsetPerMap\OffserPerMap\OffserPerMap\obj\Debug\OffsetPerMap.csproj.CoreCompileInputs.cache
+C:\Users\Chris\Documents\GitHub\OffsetPerMap\OffserPerMap\OffserPerMap\obj\Debug\OffserPerMap.dll
+C:\Users\Chris\Documents\GitHub\OffsetPerMap\OffserPerMap\OffserPerMap\obj\Debug\OffserPerMap.pdb

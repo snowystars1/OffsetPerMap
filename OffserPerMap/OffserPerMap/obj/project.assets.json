@@ -1026,9 +1026,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Chris\\Documents\\GitHub\\OffsetPerMap\\OffserPerMap\\OffserPerMap\\OffserPerMap.csproj",
-      "projectName": "OffserPerMap",
-      "projectPath": "C:\\Users\\Chris\\Documents\\GitHub\\OffsetPerMap\\OffserPerMap\\OffserPerMap\\OffserPerMap.csproj",
+      "projectUniqueName": "C:\\Users\\Chris\\Documents\\GitHub\\OffsetPerMap\\OffserPerMap\\OffserPerMap\\OffsetPerMap.csproj",
+      "projectName": "OffsetPerMap",
+      "projectPath": "C:\\Users\\Chris\\Documents\\GitHub\\OffsetPerMap\\OffserPerMap\\OffserPerMap\\OffsetPerMap.csproj",
       "packagesPath": "C:\\Users\\Chris\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\Chris\\Documents\\GitHub\\OffsetPerMap\\OffserPerMap\\OffserPerMap\\obj\\",
       "projectStyle": "PackageReference",
