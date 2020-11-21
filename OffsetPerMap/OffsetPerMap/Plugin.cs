@@ -10,7 +10,9 @@ using UnityEngine.SceneManagement;
 using IPALogger = IPA.Logging.Logger;
 using BS_Utils;
 using BS_Utils.Gameplay;
+using System.Reflection;
 using BS_Utils.Utilities;
+using HarmonyLib;
 
 namespace OffsetPerMap
 {
@@ -19,6 +21,8 @@ namespace OffsetPerMap
     {
         internal static Plugin Instance { get; private set; }
         internal static IPALogger Log { get; private set; }
+
+        internal static Harmony harmony;
 
         [Init]
         /// <summary>
@@ -37,19 +41,34 @@ namespace OffsetPerMap
         public void OnApplicationStart()
         {
             Log.Debug("OnApplicationStart");
-            BSEvents.lateMenuSceneLoadedFresh += delegate (ScenesTransitionSetupDataSO o)
-            {
-                Plugin.Log.Info("OffsetPerMap - Menu Scene Was Loaded");
-                new GameObject("OffsetPerMapController").AddComponent<OffsetPerMapController>();
-            };
-
+            Plugin.ApplyHarmonyPatches();
+            BSEvents.lateMenuSceneLoadedFresh += this.BSEvents_menuSceneLoadedFresh;
         }
 
         [OnExit]
         public void OnApplicationQuit()
         {
             Log.Debug("OnApplicationQuit");
+        }
+        public static void ApplyHarmonyPatches()
+        {
+            try
+            {
+                Plugin.Log.Debug("Applying Harmony patches.");
+                Plugin.harmony.PatchAll(Assembly.GetExecutingAssembly());
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log.Critical("Error applying Harmony patches: " + ex.Message);
+                Plugin.Log.Debug(ex);
+            }
+        }
 
+        private void BSEvents_menuSceneLoadedFresh(ScenesTransitionSetupDataSO data)
+        {
+            Plugin.Log.Info("OffsetPerMap - Menu Scene Was Loaded");
+            PersistentSingleton<OffsetUI>.instance.Setup();
+            new GameObject("OffsetPerMapController").AddComponent<OffsetPerMapController>();
         }
     }
 }
