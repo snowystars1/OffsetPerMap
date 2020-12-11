@@ -12,7 +12,6 @@ using BS_Utils;
 using BS_Utils.Gameplay;
 using System.Reflection;
 using BS_Utils.Utilities;
-using HarmonyLib;
 
 namespace OffsetPerMap
 {
@@ -22,18 +21,17 @@ namespace OffsetPerMap
         internal static Plugin Instance { get; private set; }
         internal static IPALogger Log { get; private set; }
 
-        internal static Harmony harmony;
-
         [Init]
         /// <summary>
         /// Called when the plugin is first loaded by IPA (either when the game starts or when the plugin is enabled if it starts disabled).
         /// [Init] methods that use a Constructor or called before regular methods like InitWithConfig.
         /// Only use [Init] with one Constructor.
         /// </summary>
-        public void Init(IPALogger logger)
+        public void Init(IPALogger logger, IPA.Config.Config config)
         {
             Instance = this;
             Log = logger;
+            //PluginConfig.Instance = config.Generated<PluginConfig>();
             Log.Info("OffsetPerMap initialized.");
         }
 
@@ -41,7 +39,6 @@ namespace OffsetPerMap
         public void OnApplicationStart()
         {
             Log.Debug("OnApplicationStart");
-            Plugin.ApplyHarmonyPatches();
             BSEvents.lateMenuSceneLoadedFresh += this.BSEvents_menuSceneLoadedFresh;
         }
 
@@ -49,19 +46,6 @@ namespace OffsetPerMap
         public void OnApplicationQuit()
         {
             Log.Debug("OnApplicationQuit");
-        }
-        public static void ApplyHarmonyPatches()
-        {
-            try
-            {
-                Plugin.Log.Debug("Applying Harmony patches.");
-                Plugin.harmony.PatchAll(Assembly.GetExecutingAssembly());
-            }
-            catch (Exception ex)
-            {
-                Plugin.Log.Critical("Error applying Harmony patches: " + ex.Message);
-                Plugin.Log.Debug(ex);
-            }
         }
 
         private void BSEvents_menuSceneLoadedFresh(ScenesTransitionSetupDataSO data)

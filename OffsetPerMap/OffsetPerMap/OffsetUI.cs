@@ -7,88 +7,185 @@ using BeatSaberMarkupLanguage.Components;
 using HMUI;
 using UnityEngine;
 
+
+using TMPro;
+
 namespace OffsetPerMap
 {
 	public class OffsetUI : PersistentSingleton<OffsetUI>
 	{
-		// Token: 0x17000008 RID: 8
-		// (get) Token: 0x06000019 RID: 25 RVA: 0x00002A00 File Offset: 0x00000C00
-		// (set) Token: 0x0600001A RID: 26 RVA: 0x00002A08 File Offset: 0x00000C08
-		[UIValue("interactable")]
-		public bool Interactable { get; set; } = true;
 
-		// Token: 0x0600001B RID: 27 RVA: 0x00002A14 File Offset: 0x00000C14
-		[UIAction("button-click")]
-		internal void ShowPlaylists()
+		//public static OffsetUI Instance { get; private set; }
+
+		IPA.Logging.Logger log = Plugin.Log;
+
+		//[UIComponent("NJSButton")]
+		//public TextMeshProUGUI njsButtonText { get; set; }
+		[UIComponent("NJSButton")]
+		private TextMeshProUGUI njsButtonText;
+
+		[UIValue("chosenNJS")] 
+		public string chosenNJS { get; set;} = "NJS";
+
+		public float njsBeatOffset { get; set; } = 0.0f;
+
+		[UIAction("njs-button-click")]
+		internal void ShowNJSOptions()
 		{
-			//Plugin.Log.Debug("Show Playlists");
-			//bool flag = this.customListTableData.data != null;
-			//if (flag)
-			//{
-			//	this.customListTableData.data.Clear();
-			//}
-			//this.playlists = PlaylistCollectionOverride.GetPlaylists();
-			//Plugin.Log.Debug("after get  Playlists");
-			//Plugin.Log.Debug("Playlist count: " + this.playlists.Length.ToString());
-			//bool flag2 = this.playlists.Length != 0;
-			//if (flag2)
-			//{
-			//	foreach (IAnnotatedBeatmapLevelCollection annotatedBeatmapLevelCollection in this.playlists)
-			//	{
-			//		this.customListTableData.data.Add(new CustomListTableData.CustomCellInfo(annotatedBeatmapLevelCollection.collectionName, null, annotatedBeatmapLevelCollection.coverImage));
-			//	}
-			//	this.customListTableData.tableView.ReloadData();
-			//	this.customListTableData.tableView.ScrollToCellWithIdx(0, TableViewScroller.ScrollPositionType.Beginning, false);
-			//}
+            Plugin.Log.Debug("Show Playlists");
+            bool flag = this.njsOptionsList.data != null;
+            if (flag)
+            {
+                this.njsOptionsList.data.Clear();
+            }
+			this.njsOptionsList.data.Add(new CustomListTableData.CustomCellInfo("Far", null, farIcon));
+			this.njsOptionsList.data.Add(new CustomListTableData.CustomCellInfo("Further", null, furtherIcon));
+			this.njsOptionsList.data.Add(new CustomListTableData.CustomCellInfo("Default", null, defaultIcon));
+			this.njsOptionsList.data.Add(new CustomListTableData.CustomCellInfo("Closer", null, closerIcon));
+			this.njsOptionsList.data.Add(new CustomListTableData.CustomCellInfo("Close", null, closeIcon));
+			this.njsOptionsList.tableView.ReloadData();
+            this.njsOptionsList.tableView.ScrollToCellWithIdx(2, TableViewScroller.ScrollPositionType.Center, false);
+        }
+
+		[UIAction("select-NJS")]
+		internal void SelectNJS(TableView tableView, int idx)
+		{
+			//Set the player NJSOffset to whatever was chosen
+
+			//Set the chosenNJS string so the player can see the NJS without opening the modal.
+			//The chosenNJS string appears on the njsButton from now on
+			switch (idx)
+            {
+				case 0:
+					chosenNJS = "Far";
+					njsBeatOffset = 0.5f;
+					break;
+				case 1:
+					chosenNJS = "Further";
+					njsBeatOffset = 0.25f;
+					njsButtonText.fontSize = 2;
+					break;
+				case 2:
+					chosenNJS = "Default";
+					njsBeatOffset = 0.0f;
+					njsButtonText.fontSize = 2;
+					break;
+				case 3:
+					chosenNJS = "Closer";
+					njsBeatOffset = -0.25f;
+					njsButtonText.fontSize = 2;
+					break;
+				case 4:
+					chosenNJS = "Close";
+					njsBeatOffset = -0.5f;
+					njsButtonText.fontSize = 2;
+					break;
+            }
+			this.log.Info("NJS Selected!");
+			this.modal.Hide(true, null);
+			njsButtonText.text = chosenNJS;
+
+			GameplaySetupViewController gSVC = Resources.FindObjectsOfTypeAll<GameplaySetupViewController>().First<GameplaySetupViewController>();
+			PlayerSettingsPanelController pSPC = Resources.FindObjectsOfTypeAll<PlayerSettingsPanelController>().First<PlayerSettingsPanelController>();
+			PlayerSpecificSettings oldSettings = gSVC.playerSettings;
+			PlayerSpecificSettings newSettings = new PlayerSpecificSettings(
+				oldSettings.staticLights, 
+				oldSettings.leftHanded, 
+				oldSettings.playerHeight, 
+				oldSettings.automaticPlayerHeight,
+				oldSettings.sfxVolume,
+				oldSettings.reduceDebris,
+				oldSettings.noTextsAndHuds,
+				oldSettings.noFailEffects,
+				oldSettings.advancedHud,
+				oldSettings.autoRestart,
+				oldSettings.saberTrailIntensity,
+				njsBeatOffset,
+				oldSettings.hideNoteSpawnEffect,
+				oldSettings.adaptiveSfx);
+			pSPC.SetData(newSettings);
+
+			////save it to file based on level ID
+			//PluginConfig config = PluginConfig.Instance;
+			//config.njsOffsetList.Add(idx);
+
+			//CustomPreviewBeatmapLevel thisLevel = (standardLevel.selectedDifficultyBeatmap is CustomPreviewBeatmapLevel) 
+			//	? standardLevel.selectedDifficultyBeatmap as CustomPreviewBeatmapLevel 
+			//	: null;
+
+			//config.songList.Add(thisLevel.levelID);
 		}
 
-		// Token: 0x0600001C RID: 28 RVA: 0x00002B13 File Offset: 0x00000D13
-		[UIAction("select-playlist")]
-		internal void SelectPlaylist(TableView tableView, int idx)
-		{
-			//this.selectedPlaylist = (CustomBeatmapLevelCollectionSO)this.playlists[idx].beatmapLevelCollection;
-			//Plugin.Log.Debug("selected playlist: " + this.selectedPlaylist.name);
-		}
-
-		// Token: 0x0600001D RID: 29 RVA: 0x00002B50 File Offset: 0x00000D50
-		[UIAction("add-to-playlist")]
-		internal void AddToPlaylist()
-		{
-			//LoadPlaylistScript.AddSongToPlaylist(this.selectedPlaylist.playlistPath, this.level.levelID);
-			//Plugin.Log.Debug("Added playlist: " + this.selectedPlaylist.name);
-			//this.modal.Hide(true, null);
-		}
-
-		// Token: 0x0600001E RID: 30 RVA: 0x00002BA8 File Offset: 0x00000DA8
 		internal void Setup()
 		{
+			//Instance = this;
+
+			Color farColor = new Color(0.827f, 0.164f, 0.172f);
+			Color furtherColor = new Color(0.921f, 0.611f, 0.615f);
+			Color defaultColor = new Color(0.588f, 0.588f, 0.588f);
+			Color closerColor = new Color(0.611f, 0.921f, 0.917f);
+			Color closeColor = new Color(0.164f, 0.827f, 0.819f);
+
+			//Create Sprites for the icons in the NJS modal list
+			Texture2D farTexture = CreateTexture(farColor);
+			farIcon = Sprite.Create(farTexture, new Rect(0.0f, 0.0f, farTexture.width, farTexture.height), new Vector2(0.0f, 0.0f));
+
+			Texture2D furtherTexture = CreateTexture(furtherColor);
+			furtherIcon = Sprite.Create(furtherTexture, new Rect(0.0f, 0.0f, furtherTexture.width, furtherTexture.height), new Vector2(0.0f, 0.0f));
+
+			Texture2D defaultTexture = CreateTexture(defaultColor);
+			defaultIcon = Sprite.Create(defaultTexture, new Rect(0.0f, 0.0f, defaultTexture.width, defaultTexture.height), new Vector2(0.0f, 0.0f));
+
+			Texture2D closerTexture = CreateTexture(closerColor);
+			closerIcon = Sprite.Create(closerTexture, new Rect(0.0f, 0.0f, closerTexture.width, closerTexture.height), new Vector2(0.0f, 0.0f));
+
+			Texture2D closeTexture = CreateTexture(closeColor);
+			closeIcon = Sprite.Create(closeTexture, new Rect(0.0f, 0.0f, closeTexture.width, closeTexture.height), new Vector2(0.0f, 0.0f));
+
+			//Instantiate the BSML
 			this.standardLevel = Resources.FindObjectsOfTypeAll<StandardLevelDetailViewController>().First<StandardLevelDetailViewController>();
 			GameObject gameObject = this.standardLevel.transform.Find("LevelDetail").gameObject;
 			PersistentSingleton<BSMLParser>.instance.Parse(Utilities.GetResourceContent(Assembly.GetExecutingAssembly(), "OffsetPerMap.Views.View1.bsml"), gameObject.transform.Find("ActionButtons").gameObject, this);
-			this.addButtonTransform.localScale *= 0.7f;
+			this.njsButtonTransform.localScale *= 0.7f;
+
 		}
 
-		// Token: 0x0400000D RID: 13
+		private Texture2D CreateTexture(Color color)
+        {
+			Texture2D texture = new Texture2D(128, 128);
+			// colors used to tint the first 3 mip levels
+			//var mipCount = Mathf.Min(1, farTexture.mipmapCount);
+			var mipCount = texture.mipmapCount;
+			// tint each mip level
+			for (var mip = 0; mip < mipCount; ++mip)
+			{
+				var cols = texture.GetPixels32(mip);
+				for (var i = 0; i < cols.Length; ++i)
+				{
+					cols[i] = Color32.Lerp(cols[i], color, 1f);
+				}
+				texture.SetPixels32(cols, mip);
+			}
+			texture.Apply(false);
+			return texture;
+		}
+
 		private StandardLevelDetailViewController standardLevel;
 
-		// Token: 0x0400000E RID: 14
-		private IAnnotatedBeatmapLevelCollection[] playlists;
-
-		// Token: 0x0400000F RID: 15
-		//private CustomBeatmapLevelCollectionSO selectedPlaylist;
-
-		// Token: 0x04000010 RID: 16
 		public CustomPreviewBeatmapLevel level;
 
-		// Token: 0x04000011 RID: 17
+		private Sprite farIcon;
+		private Sprite furtherIcon;
+		private Sprite defaultIcon;
+		private Sprite closerIcon;
+		private Sprite closeIcon;
+
 		[UIComponent("list")]
-		public CustomListTableData customListTableData;
+		public CustomListTableData njsOptionsList;
 
-		// Token: 0x04000012 RID: 18
-		[UIComponent("add-button")]
-		private Transform addButtonTransform;
+		[UIComponent("NJSButton")]
+		private Transform njsButtonTransform;
 
-		// Token: 0x04000013 RID: 19
 		[UIComponent("modal")]
 		private ModalView modal;
 	}

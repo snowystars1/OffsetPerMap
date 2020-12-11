@@ -1,12 +1,12 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-  <button id='add-button' text='+' interactable='~interactable' anchor-pos-x='4.8' anchor-pos-y='0' pref-width='12' pref-height='12' click-event='open-modal' on-click='button-click'></button>
-  <modal id="modal" show-event='open-modal' hide-event='close-modal' clickerino-offerino-closerino="true" anchor-pos-y='40' size-delta-x='65' size-delta-y='75' move-to-center='false'>
-    <button id ='close-modal-button' text='Close' click-event='close-modal' anchor-pos-x ='10' anchor-pos-y='5' ></button>
-    <button id ='select-ok-button' text='Add' on-click='add-to-playlist' anchor-pos-x ='25' anchor-pos-y='5' ></button>
-    <vertical horizontal-fit='PreferredSize' vertical-fit='PreferredSize' anchor-pos-y='3' size-delta-y='0'>
-      <page-button event-click='list#PageUp' direction='Up' ignore-layout='true' anchor-min-y='0.8' anchor-pos-x='25' anchor-pos-y='10' pref-width='12'></page-button>
-      <list id='list' select-cell='select-playlist' expand-cell='true' pref-height='50'></list>
-      <page-button event-click='list#PageDown' direction='Down' ignore-layout='true' anchor-min-y='-0.8' anchor-pos-x='25' anchor-pos-y='-16' pref-width='12'></page-button>
+  <button id='NJSButton' text='NJS' anchor-pos-x='2.2' anchor-pos-y='55' pref-width='12' pref-height='10' click-event='open-modal' on-click='njs-button-click'></button>
+  <modal id="modal" show-event='open-modal' hide-event='close-modal' clickerino-offerino-closerino="true" anchor-pos-y='40' size-delta-x='40' size-delta-y='50' move-to-center='false'>
+    <!--<button id ='close-modal-button' text='Close' click-event='close-modal' anchor-pos-x ='10' anchor-pos-y='5' ></button>-->
+    <!--<button id ='select-ok-button' text='Select' on-click='add-to-playlist' anchor-pos-x ='25' anchor-pos-y='5' ></button>-->
+    <vertical horizontal-fit='PreferredSize' vertical-fit='PreferredSize' anchor-pos-y='-1' size-delta-y='0'>
+      <!--<page-button event-click='list#PageUp' direction='Up' ignore-layout='true' anchor-min-y='0.8' anchor-pos-x='25' anchor-pos-y='10' pref-width='12'></page-button>-->
+      <list id='list' select-cell='select-NJS' expand-cell='true' pref-height='44' list-width='35' hide-event='close-modal'></list>
+      <!--<page-button event-click='list#PageDown' direction='Down' ignore-layout='true' anchor-min-y='-0.8' anchor-pos-x='25' anchor-pos-y='-16' pref-width='12'></page-button>-->
     </vertical>
   </modal>
 </bg>

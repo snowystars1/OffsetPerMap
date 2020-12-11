@@ -10,10 +10,6 @@ using UnityEngine.UI;
 
 namespace OffsetPerMap
 {
-    /// <summary>
-    /// Monobehaviours (scripts) are added to GameObjects.
-    /// For a full list of Messages a Monobehaviour can receive from the game, see https://docs.unity3d.com/ScriptReference/MonoBehaviour.html.
-    /// </summary>
     public class OffsetPerMapController : MonoBehaviour
     {
         public static OffsetPerMapController Instance { get; private set; }
@@ -56,6 +52,26 @@ namespace OffsetPerMap
             if (log != null)
             {
                 log.Info("This is where we will load new data from the config file!");
+                //Read the NJS from the file and set the new player settings
+                //PluginConfig config = PluginConfig.Instance;
+                //OffsetUI offsetUI = OffsetUI.Instance;
+
+                //CustomPreviewBeatmapLevel thisLevel = (sldvc.selectedDifficultyBeatmap is CustomPreviewBeatmapLevel)
+                //? sldvc.selectedDifficultyBeatmap as CustomPreviewBeatmapLevel
+                //: null;
+
+                //int index = config.songList.IndexOf(thisLevel.levelID);
+                //if(index == -1)
+                //{
+                //    //Defaults
+                //    offsetUI.SelectNJS(2);
+                //}
+                //else
+                //{
+                //    //Set new shit
+                //    int newIndex = config.njsOffsetList.ElementAt(index);
+                //    offsetUI.SelectNJS(newIndex);
+                //}
             }
         }
     }
