@@ -31,7 +31,7 @@ namespace OffsetPerMap
         {
             Instance = this;
             Log = logger;
-            //PluginConfig.Instance = config.Generated<PluginConfig>();
+            PluginConfig.Instance = config.Generated<PluginConfig>();
             Log.Info("OffsetPerMap initialized.");
         }
 

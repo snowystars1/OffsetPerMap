@@ -13,9 +13,18 @@ namespace OffsetPerMap
     public class OffsetPerMapController : MonoBehaviour
     {
         public static OffsetPerMapController Instance { get; private set; }
+        public static Dictionary<string, SongAndNJS> songs = new Dictionary<string, SongAndNJS>();
+        private StandardLevelDetailViewController standardLevel;
+        IPA.Logging.Logger log = Plugin.Log;
 
         private void Start()
         {
+            //Load in all the levels from the config file to the songs dictionary.
+            foreach (SongAndNJS obj in PluginConfig.Instance.songAndNJSList)
+            {
+                songs.Add(obj.songID, obj);
+            }
+
             //Checks to see whether the "Solo Mode" button exists
             Button button = Resources.FindObjectsOfTypeAll<Button>().First((Button x) => x.name == "SoloButton");
             if (button == null)
@@ -42,36 +51,83 @@ namespace OffsetPerMap
         {
             if (contentType != StandardLevelDetailViewController.ContentType.Loading)
             {
+                standardLevel = sldvc;
                 this.Refresh();
             }
         }
 
         private void Refresh()
         {
-            IPA.Logging.Logger log = Plugin.Log;
-            if (log != null)
+            if (standardLevel is null)
             {
-                log.Info("This is where we will load new data from the config file!");
+                return;
+            }
+
+            //Check to make sure its not null
+            IPA.Logging.Logger log = Plugin.Log;
+            if (log is IPA.Logging.Logger)
+            {
+
                 //Read the NJS from the file and set the new player settings
-                //PluginConfig config = PluginConfig.Instance;
-                //OffsetUI offsetUI = OffsetUI.Instance;
+                PluginConfig config = PluginConfig.Instance;
+                OffsetUI offsetUI = OffsetUI.Instance;
 
-                //CustomPreviewBeatmapLevel thisLevel = (sldvc.selectedDifficultyBeatmap is CustomPreviewBeatmapLevel)
-                //? sldvc.selectedDifficultyBeatmap as CustomPreviewBeatmapLevel
-                //: null;
+                try
+                {
+                    //Get a reference to the song we just switched to
+                    IDifficultyBeatmap beatmap = standardLevel.selectedDifficultyBeatmap;
+                    if (beatmap is null)
+                    {
+                        this.log.Info("Beatmap was null in OffsetPerMapController.Refresh()");
+                        return;
+                    }
 
-                //int index = config.songList.IndexOf(thisLevel.levelID);
-                //if(index == -1)
-                //{
-                //    //Defaults
-                //    offsetUI.SelectNJS(2);
-                //}
-                //else
-                //{
-                //    //Set new shit
-                //    int newIndex = config.njsOffsetList.ElementAt(index);
-                //    offsetUI.SelectNJS(newIndex);
-                //}
+                    //Read from the dictionary to find the NJS of the song we just switched to
+                    SongAndNJS obj;
+                    songs.TryGetValue(beatmap.level.levelID, out obj);
+                    if (obj != null)
+                    {
+                        offsetUI.njsButtonText.text = obj.njsChoice;
+                        offsetUI.chosenOffsetString = obj.njsChoice;
+                        switch (obj.njsChoice)
+                        {
+                            case "Far":
+                                offsetUI.offsetNumber = 0.5f;
+                                offsetUI.njsButtonText.fontSize = 4;
+                                break;
+                            case "Further":
+                                offsetUI.offsetNumber = 0.25f;
+                                offsetUI.njsButtonText.fontSize = 2;
+                                break;
+                            case "Default":
+                                offsetUI.offsetNumber = 0.0f;
+                                offsetUI.njsButtonText.fontSize = 2;
+                                break;
+                            case "Closer":
+                                offsetUI.offsetNumber = -0.25f;
+                                offsetUI.njsButtonText.fontSize = 2;
+                                break;
+                            case "Close":
+                                offsetUI.offsetNumber = -0.5f;
+                                offsetUI.njsButtonText.fontSize = 2;
+                                break;
+                        }
+                        offsetUI.applyPlayerSettings();
+                    }
+                    else
+                    {
+                        offsetUI.njsButtonText.text = "NJS";
+                        offsetUI.njsButtonText.fontSize = 4;
+                        offsetUI.chosenOffsetString = "Default";
+                        offsetUI.offsetNumber = 0.0f;
+                        offsetUI.applyPlayerSettings();
+                    }
+                }
+                catch (Exception e)
+                {
+                    this.log.Info(e.StackTrace);
+                    return;
+                }
             }
         }
     }

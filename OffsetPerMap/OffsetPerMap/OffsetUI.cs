@@ -6,6 +6,7 @@ using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using HMUI;
 using UnityEngine;
+using System.Collections.Generic;
 
 
 using TMPro;
@@ -15,19 +16,35 @@ namespace OffsetPerMap
 	public class OffsetUI : PersistentSingleton<OffsetUI>
 	{
 
-		//public static OffsetUI Instance { get; private set; }
+		[UIComponent("modal")]
+		private ModalView modal;
 
-		IPA.Logging.Logger log = Plugin.Log;
+		[UIComponent("list")]
+		public CustomListTableData njsOptionsList;
 
-		//[UIComponent("NJSButton")]
-		//public TextMeshProUGUI njsButtonText { get; set; }
 		[UIComponent("NJSButton")]
-		private TextMeshProUGUI njsButtonText;
+		private Transform njsButtonTransform;
 
-		[UIValue("chosenNJS")] 
-		public string chosenNJS { get; set;} = "NJS";
+		[UIComponent("NJSButton")]
+		public TextMeshProUGUI njsButtonText;
 
-		public float njsBeatOffset { get; set; } = 0.0f;
+		[UIValue("chosenNJS")]
+		public string chosenOffsetString { get; set; } = "NJS";
+
+		public float offsetNumber { get; set; } = 0.0f;
+
+		public static OffsetUI Instance { get; private set; }
+        IPA.Logging.Logger log = Plugin.Log;
+		private StandardLevelDetailViewController standardLevel;
+		private GameplaySetupViewController gameplaySetup;
+		private PlayerSettingsPanelController playerSettingsPanel;
+		public CustomPreviewBeatmapLevel level;
+		private Sprite farIcon;
+		private Sprite furtherIcon;
+		private Sprite defaultIcon;
+		private Sprite closerIcon;
+		private Sprite closeIcon;
+
 
 		[UIAction("njs-button-click")]
 		internal void ShowNJSOptions()
@@ -50,48 +67,101 @@ namespace OffsetPerMap
 		[UIAction("select-NJS")]
 		internal void SelectNJS(TableView tableView, int idx)
 		{
-			//Set the player NJSOffset to whatever was chosen
-
-			//Set the chosenNJS string so the player can see the NJS without opening the modal.
-			//The chosenNJS string appears on the njsButton from now on
-			switch (idx)
+			if(standardLevel == null)
             {
-				case 0:
-					chosenNJS = "Far";
-					njsBeatOffset = 0.5f;
-					break;
-				case 1:
-					chosenNJS = "Further";
-					njsBeatOffset = 0.25f;
-					njsButtonText.fontSize = 2;
-					break;
-				case 2:
-					chosenNJS = "Default";
-					njsBeatOffset = 0.0f;
-					njsButtonText.fontSize = 2;
-					break;
-				case 3:
-					chosenNJS = "Closer";
-					njsBeatOffset = -0.25f;
-					njsButtonText.fontSize = 2;
-					break;
-				case 4:
-					chosenNJS = "Close";
-					njsBeatOffset = -0.5f;
-					njsButtonText.fontSize = 2;
-					break;
+				return;
             }
-			this.log.Info("NJS Selected!");
-			this.modal.Hide(true, null);
-			njsButtonText.text = chosenNJS;
+            //Set the player NJSOffset to whatever was chosen
 
-			GameplaySetupViewController gSVC = Resources.FindObjectsOfTypeAll<GameplaySetupViewController>().First<GameplaySetupViewController>();
-			PlayerSettingsPanelController pSPC = Resources.FindObjectsOfTypeAll<PlayerSettingsPanelController>().First<PlayerSettingsPanelController>();
-			PlayerSpecificSettings oldSettings = gSVC.playerSettings;
+            //Set the chosenNJS string so the player can see the NJS without opening the modal.
+            //The chosenNJS string appears on the njsButton from now on
+            try
+            {
+				switch (idx)
+				{
+					case 0:
+						chosenOffsetString = "Far";
+						offsetNumber = 0.5f;
+						break;
+					case 1:
+						chosenOffsetString = "Further";
+						offsetNumber = 0.25f;
+						njsButtonText.fontSize = 2;
+						break;
+					case 2:
+						chosenOffsetString = "Default";
+						offsetNumber = 0.0f;
+						njsButtonText.fontSize = 2;
+						break;
+					case 3:
+						chosenOffsetString = "Closer";
+						offsetNumber = -0.25f;
+						njsButtonText.fontSize = 2;
+						break;
+					case 4:
+						chosenOffsetString = "Close";
+						offsetNumber = -0.5f;
+						njsButtonText.fontSize = 2;
+						break;
+				}
+				this.log.Info("NJS Selected!");
+				this.modal.Hide(true, null);
+				njsButtonText.text = chosenOffsetString;
+
+				//Apply new player settings
+				applyPlayerSettings();
+
+				IDifficultyBeatmap beatmap = standardLevel.selectedDifficultyBeatmap;
+				if(beatmap is null)
+                {
+					this.log.Info("Beatmap was null in OffsetUI.SelectNJS()");
+					return;
+                }
+
+				//Search to see if this level is already in the song list
+				PluginConfig config = PluginConfig.Instance;
+				int listIndex;
+				SongAndNJS obj;
+				if(OffsetPerMapController.songs.TryGetValue(beatmap.level.levelID, out obj))
+                {
+					listIndex = obj.index;
+					//Alter the dictionary
+					obj.njsChoice = chosenOffsetString;
+
+					//Alter the plugin config
+					SongAndNJS temp = config.songAndNJSList.ElementAt(listIndex);
+					temp.njsChoice = chosenOffsetString;
+                }
+                else
+                {
+					//Add new song to the plugin config
+					SongAndNJS songInfo = new SongAndNJS();
+					songInfo.songID = beatmap.level.levelID;
+					songInfo.njsChoice = chosenOffsetString;
+					songInfo.index = config.songAndNJSList.Count;
+					config.songAndNJSList.Add(songInfo);
+
+					//Add new song to the dictionary
+					OffsetPerMapController.songs.Add(beatmap.level.levelID, songInfo);
+				}
+            }
+            catch(NullReferenceException e)
+            {
+				this.log.Info(e.StackTrace);
+            }
+        }
+
+		public void applyPlayerSettings()
+        {
+			if(gameplaySetup is null || playerSettingsPanel is null)
+            {
+				return;
+            }
+			PlayerSpecificSettings oldSettings = gameplaySetup.playerSettings;
 			PlayerSpecificSettings newSettings = new PlayerSpecificSettings(
-				oldSettings.staticLights, 
-				oldSettings.leftHanded, 
-				oldSettings.playerHeight, 
+				oldSettings.staticLights,
+				oldSettings.leftHanded,
+				oldSettings.playerHeight,
 				oldSettings.automaticPlayerHeight,
 				oldSettings.sfxVolume,
 				oldSettings.reduceDebris,
@@ -100,25 +170,19 @@ namespace OffsetPerMap
 				oldSettings.advancedHud,
 				oldSettings.autoRestart,
 				oldSettings.saberTrailIntensity,
-				njsBeatOffset,
+				offsetNumber,
 				oldSettings.hideNoteSpawnEffect,
 				oldSettings.adaptiveSfx);
-			pSPC.SetData(newSettings);
-
-			////save it to file based on level ID
-			//PluginConfig config = PluginConfig.Instance;
-			//config.njsOffsetList.Add(idx);
-
-			//CustomPreviewBeatmapLevel thisLevel = (standardLevel.selectedDifficultyBeatmap is CustomPreviewBeatmapLevel) 
-			//	? standardLevel.selectedDifficultyBeatmap as CustomPreviewBeatmapLevel 
-			//	: null;
-
-			//config.songList.Add(thisLevel.levelID);
+			playerSettingsPanel.SetData(newSettings);
 		}
 
 		internal void Setup()
 		{
-			//Instance = this;
+			Instance = this;
+
+			//Get references to controllers
+			gameplaySetup = Resources.FindObjectsOfTypeAll<GameplaySetupViewController>().First<GameplaySetupViewController>();
+			playerSettingsPanel = Resources.FindObjectsOfTypeAll<PlayerSettingsPanelController>().First<PlayerSettingsPanelController>();
 
 			Color farColor = new Color(0.827f, 0.164f, 0.172f);
 			Color furtherColor = new Color(0.921f, 0.611f, 0.615f);
@@ -169,24 +233,5 @@ namespace OffsetPerMap
 			texture.Apply(false);
 			return texture;
 		}
-
-		private StandardLevelDetailViewController standardLevel;
-
-		public CustomPreviewBeatmapLevel level;
-
-		private Sprite farIcon;
-		private Sprite furtherIcon;
-		private Sprite defaultIcon;
-		private Sprite closerIcon;
-		private Sprite closeIcon;
-
-		[UIComponent("list")]
-		public CustomListTableData njsOptionsList;
-
-		[UIComponent("NJSButton")]
-		private Transform njsButtonTransform;
-
-		[UIComponent("modal")]
-		private ModalView modal;
 	}
 }
