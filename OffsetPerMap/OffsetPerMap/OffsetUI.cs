@@ -15,18 +15,23 @@ namespace OffsetPerMap
 {
 	public class OffsetUI : PersistentSingleton<OffsetUI>
 	{
-
 		[UIComponent("modal")]
 		private ModalView modal;
 
 		[UIComponent("list")]
 		public CustomListTableData njsOptionsList;
 
-		[UIComponent("NJSButton")]
-		private Transform njsButtonTransform;
+        [UIComponent("NJSButton")]
+        private Transform njsButtonTransform;
 
-		[UIComponent("NJSButton")]
+        [UIComponent("NJSButton")]
 		public TextMeshProUGUI njsButtonText;
+
+		[UIComponent("SaveButton")]
+		private Transform saveButtonTransform;
+
+		[UIComponent("SaveButton")]
+		public TextMeshProUGUI saveButtonText;
 
 		[UIValue("chosenNJS")]
 		public string chosenOffsetString { get; set; } = "NJS";
@@ -45,8 +50,7 @@ namespace OffsetPerMap
 		private Sprite closerIcon;
 		private Sprite closeIcon;
 
-
-		[UIAction("njs-button-click")]
+        [UIAction("njs-button-click")]
 		internal void ShowNJSOptions()
 		{
             Plugin.Log.Debug("Show Playlists");
@@ -62,7 +66,7 @@ namespace OffsetPerMap
 			this.njsOptionsList.data.Add(new CustomListTableData.CustomCellInfo("Close", null, closeIcon));
 			this.njsOptionsList.tableView.ReloadData();
             this.njsOptionsList.tableView.ScrollToCellWithIdx(2, TableViewScroller.ScrollPositionType.Center, false);
-        }
+		}
 
 		[UIAction("select-NJS")]
 		internal void SelectNJS(TableView tableView, int idx)
@@ -86,44 +90,54 @@ namespace OffsetPerMap
 					case 1:
 						chosenOffsetString = "Further";
 						offsetNumber = 0.25f;
-						njsButtonText.fontSize = 2;
 						break;
 					case 2:
 						chosenOffsetString = "Default";
 						offsetNumber = 0.0f;
-						njsButtonText.fontSize = 2;
 						break;
 					case 3:
 						chosenOffsetString = "Closer";
 						offsetNumber = -0.25f;
-						njsButtonText.fontSize = 2;
 						break;
 					case 4:
 						chosenOffsetString = "Close";
 						offsetNumber = -0.5f;
-						njsButtonText.fontSize = 2;
 						break;
 				}
 				this.log.Info("NJS Selected!");
 				this.modal.Hide(true, null);
 				njsButtonText.text = chosenOffsetString;
+				saveButtonText.text = "Save";
+				saveButtonText.fontSize = 4;
 
 				//Apply new player settings
-				applyPlayerSettings();
+				ApplyPlayerSettings();
 
+			}
+            catch(NullReferenceException e)
+            {
+				this.log.Info(e.StackTrace);
+            }
+        }
+
+		[UIAction("save-to-file")]
+		internal void SaveToFile()
+        {
+            try
+            {
 				IDifficultyBeatmap beatmap = standardLevel.selectedDifficultyBeatmap;
-				if(beatmap is null)
-                {
+				if (beatmap is null)
+				{
 					this.log.Info("Beatmap was null in OffsetUI.SelectNJS()");
 					return;
-                }
+				}
 
 				//Search to see if this level is already in the song list
 				PluginConfig config = PluginConfig.Instance;
 				int listIndex;
 				SongAndNJS obj;
-				if(OffsetPerMapController.songs.TryGetValue(beatmap.level.levelID, out obj))
-                {
+				if (OffsetPerMapController.songs.TryGetValue(beatmap.level.levelID, out obj))
+				{
 					listIndex = obj.index;
 					//Alter the dictionary
 					obj.njsChoice = chosenOffsetString;
@@ -131,9 +145,9 @@ namespace OffsetPerMap
 					//Alter the plugin config
 					SongAndNJS temp = config.songAndNJSList.ElementAt(listIndex);
 					temp.njsChoice = chosenOffsetString;
-                }
-                else
-                {
+				}
+				else
+				{
 					//Add new song to the plugin config
 					SongAndNJS songInfo = new SongAndNJS();
 					songInfo.songID = beatmap.level.levelID;
@@ -144,14 +158,16 @@ namespace OffsetPerMap
 					//Add new song to the dictionary
 					OffsetPerMapController.songs.Add(beatmap.level.levelID, songInfo);
 				}
-            }
-            catch(NullReferenceException e)
+				saveButtonText.text = "Saved!";
+				saveButtonText.fontSize = 3;
+			}
+			catch(Exception e)
             {
 				this.log.Info(e.StackTrace);
             }
         }
 
-		public void applyPlayerSettings()
+		public void ApplyPlayerSettings()
         {
 			if(gameplaySetup is null || playerSettingsPanel is null)
             {
@@ -211,7 +227,7 @@ namespace OffsetPerMap
 			GameObject gameObject = this.standardLevel.transform.Find("LevelDetail").gameObject;
 			PersistentSingleton<BSMLParser>.instance.Parse(Utilities.GetResourceContent(Assembly.GetExecutingAssembly(), "OffsetPerMap.Views.View1.bsml"), gameObject.transform.Find("ActionButtons").gameObject, this);
 			this.njsButtonTransform.localScale *= 0.7f;
-
+			this.saveButtonTransform.localScale *= 0.7f;
 		}
 
 		private Texture2D CreateTexture(Color color)

@@ -93,34 +93,33 @@ namespace OffsetPerMap
                         {
                             case "Far":
                                 offsetUI.offsetNumber = 0.5f;
-                                offsetUI.njsButtonText.fontSize = 4;
                                 break;
                             case "Further":
                                 offsetUI.offsetNumber = 0.25f;
-                                offsetUI.njsButtonText.fontSize = 2;
                                 break;
                             case "Default":
                                 offsetUI.offsetNumber = 0.0f;
-                                offsetUI.njsButtonText.fontSize = 2;
                                 break;
                             case "Closer":
                                 offsetUI.offsetNumber = -0.25f;
-                                offsetUI.njsButtonText.fontSize = 2;
                                 break;
                             case "Close":
                                 offsetUI.offsetNumber = -0.5f;
-                                offsetUI.njsButtonText.fontSize = 2;
                                 break;
                         }
-                        offsetUI.applyPlayerSettings();
+                        offsetUI.ApplyPlayerSettings();
+                        offsetUI.saveButtonText.text = "Saved!";
+                        offsetUI.saveButtonText.fontSize = 3;
                     }
                     else
                     {
-                        offsetUI.njsButtonText.text = "NJS";
-                        offsetUI.njsButtonText.fontSize = 4;
-                        offsetUI.chosenOffsetString = "Default";
-                        offsetUI.offsetNumber = 0.0f;
-                        offsetUI.applyPlayerSettings();
+                        offsetUI.saveButtonText.text = "Save";
+                        offsetUI.saveButtonText.fontSize = 4;
+                        //offsetUI.njsButtonText.text = "NJS";
+                        //offsetUI.njsButtonText.fontSize = 4;
+                        //offsetUI.chosenOffsetString = "Default";
+                        //offsetUI.offsetNumber = 0.0f;
+                        //offsetUI.applyPlayerSettings();
                     }
                 }
                 catch (Exception e)
