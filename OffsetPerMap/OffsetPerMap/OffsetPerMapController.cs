@@ -115,11 +115,11 @@ namespace OffsetPerMap
                     {
                         offsetUI.saveButtonText.text = "Save";
                         offsetUI.saveButtonText.fontSize = 4;
-                        //offsetUI.njsButtonText.text = "NJS";
-                        //offsetUI.njsButtonText.fontSize = 4;
-                        //offsetUI.chosenOffsetString = "Default";
-                        //offsetUI.offsetNumber = 0.0f;
-                        //offsetUI.applyPlayerSettings();
+                        offsetUI.njsButtonText.text = "Default";
+                        offsetUI.njsButtonText.fontSize = 4;
+                        offsetUI.chosenOffsetString = "Default";
+                        offsetUI.offsetNumber = 0.0f;
+                        offsetUI.ApplyPlayerSettings();
                     }
                 }
                 catch (Exception e)

@@ -4,6 +4,7 @@ using System.Reflection;
 using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
+using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using UnityEngine;
 using System.Collections.Generic;
@@ -13,8 +14,16 @@ using TMPro;
 
 namespace OffsetPerMap
 {
-	public class OffsetUI : PersistentSingleton<OffsetUI>
+	public class OffsetUI : BSMLResourceViewController
 	{
+		
+		public override string ResourceName {
+            get
+            {
+				return "OffsetPerMap.Views.View1.bsml";
+			}
+		}
+		
 		[UIComponent("modal")]
 		private ModalView modal;
 
@@ -34,11 +43,11 @@ namespace OffsetPerMap
 		public TextMeshProUGUI saveButtonText;
 
 		[UIValue("chosenNJS")]
-		public string chosenOffsetString { get; set; } = "NJS";
+		public string chosenOffsetString { get; set; } = "Default";
 
 		public float offsetNumber { get; set; } = 0.0f;
 
-		public static OffsetUI Instance { get; private set; }
+		public static OffsetUI Instance { get; set; }
         IPA.Logging.Logger log = Plugin.Log;
 		private StandardLevelDetailViewController standardLevel;
 		private GameplaySetupViewController gameplaySetup;
@@ -194,8 +203,6 @@ namespace OffsetPerMap
 
 		internal void Setup()
 		{
-			Instance = this;
-
 			//Get references to controllers
 			gameplaySetup = Resources.FindObjectsOfTypeAll<GameplaySetupViewController>().First<GameplaySetupViewController>();
 			playerSettingsPanel = Resources.FindObjectsOfTypeAll<PlayerSettingsPanelController>().First<PlayerSettingsPanelController>();

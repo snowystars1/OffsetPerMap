@@ -51,7 +51,9 @@ namespace OffsetPerMap
         private void BSEvents_menuSceneLoadedFresh(ScenesTransitionSetupDataSO data)
         {
             Plugin.Log.Info("OffsetPerMap - Menu Scene Was Loaded");
-            PersistentSingleton<OffsetUI>.instance.Setup();
+            //PersistentSingleton<OffsetUI>.instance.Setup();
+            OffsetUI.Instance = new OffsetUI();
+            OffsetUI.Instance.Setup();
             new GameObject("OffsetPerMapController").AddComponent<OffsetPerMapController>();
         }
     }
